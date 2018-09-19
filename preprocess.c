@@ -1,11 +1,11 @@
 #include<stdio.h>
-#include<string.h>
 #include<stdlib.h>
 #include<locale.h>
 #include<wchar.h>
 #define BUFFER_SIZE 50000
 
 wchar_t *str_replace (wchar_t *source, wchar_t *find,  wchar_t *rep);
+int isChinese(wchar_t* data);
 
 int main() {
     if (!setlocale(LC_CTYPE, "")) {
@@ -38,9 +38,7 @@ int main() {
             wchar_t* buffer;
             wchar_t* token = wcstok(line, delimiters, &buffer);
             while(token != NULL) {
-                wchar_t tmp[BUFFER_SIZE];
-                wcscpy(tmp, token);
-                fprintf(outFile, "%ls,%ls,%ls\n", url, title, tmp);
+                if(wcslen(token) > 5 && isChinese(token)) fprintf(outFile, "%ls,%ls,%ls\n", url, title, token);
                 token = wcstok(NULL, delimiters, &buffer);
             }
 
@@ -58,7 +56,7 @@ int main() {
     return 0;
 }
 
-wchar_t *str_replace (wchar_t *source, wchar_t *find,  wchar_t *rep){  
+wchar_t *str_replace (wchar_t *source, wchar_t *find,  wchar_t *rep) {  
    // 搜尋文字的長度  
    int find_L=wcslen(find);  
    // 替換文字的長度  
@@ -104,4 +102,18 @@ wchar_t *str_replace (wchar_t *source, wchar_t *find,  wchar_t *rep){
   
    return result;  
   
-} 
+}
+
+int isChinese(wchar_t* data) {
+    for (unsigned x = 0; x < wcslen(data); x++)
+    {
+        char hex[5];
+        char *ptr;
+        long result;
+        sprintf(hex, "%04x", data[x]);
+        result = strtol(hex, &ptr, 16);
+        if(!(0x4e00 <= result && result <= 0x9fa5)) return 0; // 中文字編碼範圍
+    }
+
+    return 1;
+}
