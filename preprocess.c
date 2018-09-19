@@ -1,45 +1,54 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-#define BUFFER_SIZE 1000
+#include<locale.h>
+#include<wchar.h>
+#define BUFFER_SIZE 50000
 
-char *str_replace (char *source, char *find,  char *rep);
+wchar_t *str_replace (wchar_t *source, wchar_t *find,  wchar_t *rep);
 
 int main() {
+    if (!setlocale(LC_CTYPE, "")) {
+        fprintf(stderr, "Error:Please check LANG, LC_CTYPE, LC_ALL.\n");
+        return 1;
+    }
+
     FILE* inFile = fopen("./ettoday.rec", "r");
     FILE* outFile = fopen("./ettoday.csv", "w");
 
-    char line[BUFFER_SIZE];
+    wchar_t line[BUFFER_SIZE];
     int B_flag = 0;
 
-    while(fgets(line, sizeof(line), inFile) != NULL) {
-        char url[BUFFER_SIZE], title[BUFFER_SIZE];
-
-        if(strstr(line, "@U") != NULL) {
-            strcpy(line, str_replace(line, "@U:", ""));
-            strcpy(line, str_replace(line, "\n", ""));
-            strcpy(url, line);
-        } else if(strstr(line, "@T") != NULL) {
-            strcpy(line, str_replace(line, "@T:", ""));
-            strcpy(line, str_replace(line, "\n", ""));
-            strcpy(title, line);
-        } else if(B_flag == 1) {
-            strcpy(line, str_replace(line, "                                 ", ""));
-            strcpy(line, str_replace(line, "\n", ""));
-            char delimiters[10] = "。！？";
-            char* token = strtok(line, delimiters);
+    while(fgetws(line, sizeof(line), inFile) != NULL) {
+        wchar_t url[BUFFER_SIZE], title[BUFFER_SIZE];
+        
+        if(wcsstr(line, L"@U") != NULL) {
+            wcscpy(line, str_replace(line, L"@U:", L""));
+            wcscpy(line, str_replace(line, L"\n", L""));
+            wcscpy(url, line);
+        } else if(wcsstr(line, L"@T") != NULL) {
+            wcscpy(line, str_replace(line, L"@T:", L""));
+            wcscpy(line, str_replace(line, L"\n", L""));
+            wcscpy(title, line);
+        }
+        else if(B_flag == 1) {
+            wcscpy(line, str_replace(line, L"                                 ", L""));
+            wcscpy(line, str_replace(line, L"\n", L""));
+            wchar_t delimiters[10] = L"。！？";
+            wchar_t* buffer;
+            wchar_t* token = wcstok(line, delimiters, &buffer);
             while(token != NULL) {
-                char tmp[BUFFER_SIZE];
-                strcpy(tmp, token);
-                if(strlen(tmp) > 10) fprintf(outFile, "%s,%s,%s\n", url, title, tmp);
-                token = strtok(NULL, delimiters);
+                wchar_t tmp[BUFFER_SIZE];
+                wcscpy(tmp, token);
+                fprintf(outFile, "%ls,%ls,%ls\n", url, title, tmp);
+                token = wcstok(NULL, delimiters, &buffer);
             }
 
             // Clear Variable
-            strcpy(url, "");
-            strcpy(title, "");
+            wcscpy(url, L"");
+            wcscpy(title, L"");
             B_flag = 0;
-        } else if(strstr(line, "@B:") != NULL) {
+        } else if(wcsstr(line, L"@B:") != NULL) {
             B_flag = 1;
         }
     }
@@ -49,24 +58,24 @@ int main() {
     return 0;
 }
 
-char *str_replace (char *source, char *find,  char *rep){  
+wchar_t *str_replace (wchar_t *source, wchar_t *find,  wchar_t *rep){  
    // 搜尋文字的長度  
-   int find_L=strlen(find);  
+   int find_L=wcslen(find);  
    // 替換文字的長度  
-   int rep_L=strlen(rep);  
+   int rep_L=wcslen(rep);  
    // 結果文字的長度  
-   int length=strlen(source)+1;  
+   int length=wcslen(source)+1;  
    // 定位偏移量  
    int gap=0;  
      
    // 建立結果文字，並複製文字  
-   char *result = (char*)malloc(sizeof(char) * length);  
-   strcpy(result, source);      
+   wchar_t *result = (wchar_t*)malloc(sizeof(wchar_t) * length);  
+   wcscpy(result, source);      
      
    // 尚未被取代的字串  
-   char *former=source;  
+   wchar_t *former=source;  
    // 搜尋文字出現的起始位址指標  
-   char *location= strstr(former, find);  
+   wchar_t *location= wcsstr(former, find);  
      
    // 漸進搜尋欲替換的文字  
    while(location!=NULL){  
@@ -78,21 +87,21 @@ char *str_replace (char *source, char *find,  char *rep){
        // 計算新的長度  
        length+=(rep_L-find_L);  
        // 變更記憶體空間  
-       result = (char*)realloc(result, length * sizeof(char));  
+       result = (wchar_t*)realloc(result, length * sizeof(wchar_t));  
        // 替換的文字串接在結果後面  
-       strcat(result, rep);  
+       wcscat(result, rep);  
        // 更新定位偏移量  
        gap+=rep_L;  
          
        // 更新尚未被取代的字串的位址  
        former=location+find_L;  
        // 將尚未被取代的文字串接在結果後面  
-       strcat(result, former);  
+       wcscat(result, former);  
          
        // 搜尋文字出現的起始位址指標  
-       location= strstr(former, find);  
+       location= wcsstr(former, find);  
    }      
   
    return result;  
   
-}  
+} 
