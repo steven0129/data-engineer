@@ -38,7 +38,7 @@ int main() {
             wchar_t* buffer;
             wchar_t* token = wcstok(line, delimiters, &buffer);
             while(token != NULL) {
-                if(wcslen(token) > 5 && isChinese(token)) fprintf(outFile, "%ls,%ls,%ls\n", url, title, token);
+                if(wcslen(token) > 5 && isChinese(token)) fprintf(outFile, "%ls,%ls,%ls\n", token, url, title);
                 token = wcstok(NULL, delimiters, &buffer);
             }
 

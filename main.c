@@ -3,17 +3,14 @@
 #define BUFFER_SIZE 1000
 
 int main(int argc, char *argv[]) {
-    char cmd1[7];
+    char cmd[] = "grep '";
     char cmd2[100];
-    char cmd3[14];
     
     if(argc > 1) {
-        strcpy(cmd1, "grep '");
-        strcpy(cmd2, argv[1]);
-        strcpy(cmd3, "' ettoday.csv");
-        strcat(cmd1, cmd2);
-        strcat(cmd1, cmd3);
-        FILE* result = popen(cmd1, "r");
+        strcat(cmd, argv[1]);
+        strcat(cmd, "' ettoday.csv");
+        strcat(cmd, " | sort");
+        FILE* result = popen(cmd, "r");
         char buffer[BUFFER_SIZE];
 
         while(fgets(buffer, sizeof(buffer), result) != NULL) {
