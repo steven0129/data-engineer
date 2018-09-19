@@ -4,7 +4,6 @@
 
 int main(int argc, char *argv[]) {
     char cmd[] = "grep '";
-    char cmd2[100];
     
     if(argc > 1) {
         strcat(cmd, argv[1]);
