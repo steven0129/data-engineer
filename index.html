@@ -32,7 +32,6 @@
                         cols = rows[i].split(',')
 
                         for (var j = 0; j < cols.length; j++) {
-                            console.log(cols[j])
                             result += '<td>' + cols[j] + '</td>';
                         }
 
@@ -43,7 +42,7 @@
                 }
             }
 
-            xhttp.open("GET", "http://140.123.97.235:3000/data?q=" + query, true);
+            xhttp.open("GET", "http://" + window.location.hostname + ":3000/data?q=" + query, true);
             xhttp.send();
         }
     </script>
