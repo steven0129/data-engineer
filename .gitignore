@@ -2,3 +2,4 @@
 *.out
 *.csv
 *.rec
+node_modules/

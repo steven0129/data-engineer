@@ -1,0 +1,52 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+</head>
+
+<body>
+    <input type="text" id="input">
+    <button onclick="getData(document.getElementById('input').value)">搜尋</button>
+
+    <br>
+    <br>
+
+    <table id="table" border="5">
+        <tr>
+            <th>內文</th>
+            <th>網址</th>
+            <th>標題</th>
+        </tr>
+    </table>
+    <script>
+        function getData(query) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState == XMLHttpRequest.DONE) {
+                    document.getElementById('table').innerHTML = '<tr><th>內文</th><th>網址</th><th>標題</th></tr>';
+                    var response = xhttp.responseText;
+                    var rows = response.split('\n');
+                    var result = '';
+                    for (var i = 0; i < rows.length; i++) {
+                        result += '<tr>';
+                        cols = rows[i].split(',')
+
+                        for (var j = 0; j < cols.length; j++) {
+                            console.log(cols[j])
+                            result += '<td>' + cols[j] + '</td>';
+                        }
+
+                        result += '</tr>';
+                    }
+
+                    document.getElementById('table').innerHTML += result;
+                }
+            }
+
+            xhttp.open("GET", "http://140.123.97.235:3000/data?q=" + query, true);
+            xhttp.send();
+        }
+    </script>
+</body>
+
+</html>
